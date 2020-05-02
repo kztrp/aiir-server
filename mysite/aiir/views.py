@@ -1,11 +1,14 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from rest_framework import permissions
+from rest_framework import status
 from .models import Calculation
-from .serializers import UserSerializer, GroupSerializer, CalculationSerializer
+from .serializers import UserSerializer, GroupSerializer, CalculationSerializer, CustomUserSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -68,3 +71,17 @@ def calculation_detail(request, pk):
     elif request.method == 'DELETE':
         calculation.delete()
         return HttpResponse(status=204)
+
+class CustomUserCreate(APIView):
+
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
+
+    def post(self, request, format='json'):
+        serializer = CustomUserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            if user:
+                json = serializer.data
+                return Response(json, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
