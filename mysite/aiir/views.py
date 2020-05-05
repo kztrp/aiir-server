@@ -52,7 +52,7 @@ def calculation_detail(request, pk):
     Retrieve, update or delete a code calculation
     """
     try:
-        calculation = Calculation.objects.get(pk=pk)
+        calculation = Calculation.objects.filter()
     except Calculation.DoesNotExist:
         return HttpResponse(status=404)
 
@@ -71,6 +71,16 @@ def calculation_detail(request, pk):
     elif request.method == 'DELETE':
         calculation.delete()
         return HttpResponse(status=204)
+
+@csrf_exempt
+def calculation_user(request, user):
+    """
+    Retrieve, update or delete a code calculation
+    """
+    if request.method == 'GET':
+        calculations = Calculation.objects.all().filter(user=user)
+        serializer = CalculationSerializer(calculations, many=True)
+        return JsonResponse(serializer.data, safe=False)
 
 class CustomUserCreate(APIView):
 
