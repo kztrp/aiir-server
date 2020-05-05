@@ -52,7 +52,7 @@ def calculation_detail(request, pk):
     Retrieve, update or delete a code calculation
     """
     try:
-        calculation = Calculation.objects.filter()
+        calculation = Calculation.objects.get(pk=pk)
     except Calculation.DoesNotExist:
         return HttpResponse(status=404)
 
@@ -63,6 +63,15 @@ def calculation_detail(request, pk):
     elif request.method == 'PUT':
         data = JSONParser().parse(request)
         serializer = CalculationSerializer(calculation, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
+
+    elif request.method == 'PATCH':
+        data = JSONParser().parse(request)
+        print(data)
+        serializer = CalculationSerializer(calculation, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data)

@@ -18,7 +18,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class CalculationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Calculation
-        fields = ['id', 'number', 'user', 'progress', 'title', 'text']
+        fields = ['id', 'number', 'result', 'user', 'progress', 'title', 'text']
 
 
 class CustomUserSerializer(serializers.ModelSerializer):

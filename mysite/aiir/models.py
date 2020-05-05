@@ -9,8 +9,8 @@ from django_currentuser.db.models import CurrentUserField
 class Calculation(models.Model):
 	number = models.IntegerField(default=0)
 	title = models.CharField(max_length=100, default='')
-	progress = 0
-	result = 0
+	progress = models.FloatField(default=0)
+	result = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True)
 	user = CurrentUserField()
 	text = models.TextField()
