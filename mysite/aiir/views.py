@@ -9,6 +9,9 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from os import system
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -42,6 +45,7 @@ def calculation_list(request):
         data = JSONParser().parse(request)
         serializer = CalculationSerializer(data=data)
         if serializer.is_valid():
+
             serializer.save()
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
@@ -104,3 +108,14 @@ class CustomUserCreate(APIView):
                 json = serializer.data
                 return Response(json, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LoginView(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
+    def post(self, request):
+        user = User.objects.all().filter(username=request.data["username"])
+        for u in user:
+            if u.check_password(request.data["password"]):
+                json = u.id
+                return Response(json, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

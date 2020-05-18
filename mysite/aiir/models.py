@@ -11,6 +11,7 @@ class Calculation(models.Model):
 	title = models.CharField(max_length=100, default='')
 	progress = models.FloatField(default=0)
 	result = models.BooleanField(default=False)
+	is_fermat = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True)
 	user = CurrentUserField()
 	text = models.TextField()
