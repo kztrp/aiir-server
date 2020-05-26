@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from os import system
+import socket
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -43,9 +44,22 @@ def calculation_list(request):
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)
+        HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
+        PORT = 8082  # Port to listen on (non-privileged ports are > 1023)
+        method = int(data["is_fermat"])
+        number = data["number"]
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, PORT))
+            data_sent = bytes("{}{}".format(method, number), "utf8")
+            print(data_sent)
+            s.send(data_sent)
+            data_received = s.recv(1024)
+            # print('Received', bool(data))
+            print('Received', int(data_received))
+            data["result"] = bool(int(data_received))
+            data['progress'] = 1
         serializer = CalculationSerializer(data=data)
         if serializer.is_valid():
-
             serializer.save()
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
